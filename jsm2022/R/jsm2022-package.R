@@ -2,7 +2,7 @@
 #'
 #' We scraped the JSM program and wrangled decades of citation and coauthorship
 #' data from Semantic Scholar and Arxiv.  We have also included functionality 
-#' for exporting your schedule as an iCal that can be loaded into Google 
+#' for exporting your schedule as an ical that can be loaded into Google 
 #' Calendar or similar. The result is a package that streamlines the
 #' process of finding talks that you may want to attend.
 #' 

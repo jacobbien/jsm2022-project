@@ -405,54 +405,63 @@ usethis::use_mit_license(copyright_holder = &quot;J. Bien&quot;)</code></pre>
 #&#39;
 #&#39; We scraped the JSM program and wrangled decades of citation and coauthorship
 #&#39; data from Semantic Scholar and Arxiv.  We have also included functionality 
-#&#39; for exporting your schedule as an iCal that can be loaded into Google 
+#&#39; for exporting your schedule as an ical that can be loaded into Google 
 #&#39; Calendar or similar. The result is a package that streamlines the
 #&#39; process of finding talks that you may want to attend.
 #&#39; 
 #&#39; @docType package
 #&#39; @seealso [`get_talks`], [`get_coauthors`], [`get_out_citations`], [`get_in_citations`], [`export_calendar_to_ics`], [`export_calendar_to_csv`]}</code></pre>
+<p>Some packages we’ll be using:</p>
+<pre class="r"><code>library(dplyr)
+library(stringr)
+library(purrr)
+library(lubridate)</code></pre>
 <p>Create a README:</p>
 <pre class="r"><code>readme_txt &lt;- 
-&quot;
+&#39;
 # jsm2022
 
 Navigate the JSM schedule from the comfort of an R console, get personalized recommendations for talks, and export your schedule as an ical.
 
 ## About
 
-We scraped the JSM program and wrangled decades of citation and coauthorship data from Semantic Scholar and Arxiv.  We have also included functionality for exporting your schedule as an iCal that can be loaded into Google Calendar or similar. The result is a package that streamlines the process of finding talks that you may want to attend.
+We scraped the JSM program and wrangled decades of citation and coauthorship data from Semantic Scholar and Arxiv.  We have also included functionality for exporting your schedule as an ical that can be loaded into Google Calendar or similar. The result is a package that streamlines the process of finding talks that you may want to attend.
 
 ## Getting started
 
-``` r
-remotes::install_github(\&quot;jacobbien/jsm2022\&quot;)
+To install the package:
+
+rstart
+remotes::install_github(&quot;jacobbien/jsm2022&quot;)
+rend
+ 
+An example of the sort of thing you can do with the package:
+
+rstart
 library(jsm2022)
-<a href='#get_talks'>get_talks</a>()
-```&quot;
-cat(readme_txt, file = &quot;README.md&quot;)</code></pre>
+my_coauthors &lt;- <a href='#get_coauthors'>get_coauthors</a>(&quot;Jacob Bien&quot;)
+people_cited_by_me &lt;- <a href='#get_out_citations'>get_out_citations</a>(&quot;Jacob Bien&quot;)
+people_citing_me &lt;- <a href='#get_in_citations'>get_in_citations</a>(&quot;Jacob Bien&quot;)
+some_people &lt;- c(my_coauthors, people_cited_by_me[1:20], people_citing_me[1:20])
+schedule &lt;- <a href='#get_talks'>get_talks</a>(speakers = some_people)
+rend
+
+This produces a data frame of talks.  See `?get_talks` for the other ways you can filter talks.  Finally, you can export this in the ical format, which can be imported into Google Calendar and other standard calendars:
+
+rstart
+<a href='#export_calendar_to_ics'>export_calendar_to_ics</a>(schedule, file = &quot;jsm-talks.ics&quot;)
+rend
+&#39;
+readme_txt %&gt;% 
+  str_replace_all(&quot;\nrstart\n&quot;, &quot;\n``` r\n&quot;) %&gt;%
+  str_replace_all(&quot;\nrend\n&quot;, &quot;\n```\n&quot;) %&gt;% 
+  cat(file = &quot;README.md&quot;)</code></pre>
 </div>
 <div id="putting-the-jsm-schedule-into-the-package" class="section level2">
 <h2>Putting the JSM schedule into the package</h2>
 <p>Quite a bit of coding went into scraping and wrangling the JSM
 program to get it into the form of a data frame. At some point we can
 add that code, but for now let’s just load it from RDS file.</p>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(stringr)
-library(purrr)
-library(lubridate)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lubridate&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     date, intersect, setdiff, union</code></pre>
 <pre class="r"><code>talks &lt;- readRDS(file.path(&quot;..&quot;, &quot;data&quot;, &quot;jsm-talks.RDS&quot;))
 talks &lt;- talks %&gt;% 
   mutate(
@@ -601,7 +610,7 @@ these are properly included in the package.</p>
     talk_jb
   )
 })</code></pre>
-<pre><code>## Test passed 😸</code></pre>
+<pre><code>## Test passed 🌈</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>
@@ -735,7 +744,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 🌈</code></pre>
+<pre><code>## Test passed 😀</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author

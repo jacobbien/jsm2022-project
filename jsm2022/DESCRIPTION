@@ -1,0 +1,31 @@
+Package: jsm2022
+Title: Deciding on Your Schedule for JSM
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Jacob", "Bien", , "jbien@usc.edu", role = c("aut", "cre")),
+    person("Yibin", "Xiong", role = "ctb")
+  )
+Description: Navigate the JSM schedule from the comfort of an R console,
+    get personalized recommendations for talks, and export your schedule
+    as an ical.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
+Depends: 
+    R (>= 2.10)
+LazyData: true
+Imports: 
+    calendar,
+    dplyr,
+    magrittr,
+    Matrix,
+    readr,
+    rlang,
+    stringr,
+    tibble
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+LitrVersionUsed: 0.0.3
+LitrId: c8ee1b9d73e7c500294cd335fdd286a1

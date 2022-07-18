@@ -1,0 +1,554 @@
+---
+title: "Creating the ``r params$package_name`` R package"
+author: "Jacob Bien & Yibin Xiong"
+date: "July 2022"
+knit: litr::render
+params:
+  package_name: "jsm2022" # <-- change this to your package name
+  package_parent_dir: "." # <-- relative to this file's location
+---
+
+<!-- This Rmd file contains all the code needed to define an R package.  Press "Knit" in RStudio or more generally run `rmarkdown::render("name-of-this-file.Rmd")` to generate the R package.  Remember that when you want to modify anything about the R package, you should modify this document rather than the package that is outputted.
+-->
+
+Note: This package was generated using the `litr` R package, which lets you define full R packages in a single R Markdown file. For more on `litr`, see [here](https://github.com/jacobbien/litr-project/tree/main/litr).
+
+## Package setup
+
+We start by specifying the information needed in the DESCRIPTION file of the R package.
+
+```{r package-setup, message=FALSE, results='hide'}
+usethis::create_package(
+  path = ".",
+  fields = list(
+    Package = params$package_name,
+    Version = "0.0.0.9000",
+    Title = "Deciding on Your Schedule for JSM",
+    Description = "Navigate the JSM schedule from the comfort of an R console, get personalized recommendations for talks, and export your schedule as an ical.",
+    `Authors@R` = c(
+      person(
+        given = "Jacob",
+        family = "Bien",
+        email = "jbien@usc.edu",
+        role = c("aut", "cre")
+        ),
+      person(
+        given = "Yibin",
+        family = "Xiong",
+        role = "ctb")
+      )
+    )
+)
+usethis::use_mit_license(copyright_holder = "J. Bien")
+```
+
+```{package_doc}
+#' A package to help you decide what talks to attend at JSM
+#'
+#' We scraped the JSM program and wrangled decades of citation and coauthorship
+#' data from Semantic Scholar and Arxiv.  We have also included functionality 
+#' for exporting your schedule as an iCal that can be loaded into Google 
+#' Calendar or similar. The result is a package that streamlines the
+#' process of finding talks that you may want to attend.
+#' 
+#' @docType package
+#' @seealso [`get_talks`], [`get_coauthors`], [`get_out_citations`], [`get_in_citations`], [`export_calendar_to_ics`], [`export_calendar_to_csv`]}
+```
+
+
+## Putting the JSM schedule into the package
+
+Quite a bit of coding went into scraping and wrangling the JSM program to get it into the form of a data frame.  At some point we can add that code, but for now let's just load it from RDS file.
+
+```{r}
+library(dplyr)
+library(stringr)
+library(purrr)
+library(lubridate)
+talks <- readRDS(file.path("..", "data", "jsm-talks.RDS"))
+talks <- talks %>% 
+  mutate(
+    end_time = mdy_hm(paste(day, end_time), tz = "America/New_York"),
+    day = lubridate::mdy(day)
+  ) %>% 
+  mutate(authors = map_chr(authors, ~ paste(.x, collapse = ", "))) %>% 
+  rename(author = authors) %>% 
+  mutate(speaker = map_chr(speaker, ~ paste(.x, collapse = ", "))) %>% 
+  mutate(chair = map_chr(chair, ~ paste(.x, collapse = ", "))) %>% 
+  mutate(organizer = map_chr(organizer, ~ paste(.x, collapse = ", "))) %>% 
+  mutate(title = as.character(title))
+```
+
+There are `r nrow(talks)` talks.  For each talk, we provide the following information:
+
+```{r}
+names(talks)
+```
+
+Let's send this off to the package:
+
+```{r}
+usethis::use_data(talks)
+```
+
+And we'll need to document the data set as well:
+
+```{r}
+#' The JSM program as a data frame
+#' 
+#' @format A data frame where each row is a talk and with the following variables:
+#' \describe{
+#' \item{session_number}{}
+#' \item{session_title}{}
+#' \item{session_type}{}
+#' \item{day}{The day}{}
+#' \item{start_time}{}
+#' \item{end_time}{}
+#' \item{author}{The name(s) of the author(s).  Names separated by commas.}
+#' \item{speaker}{The name of the speaker.  In rare cases where there are multiple speakers, their names are separated by commas.}
+#' \item{title}{The talk title}
+#' \item{room}{}
+#' \item{chair}{}
+#' \item{organizer}{}
+#' }
+#' @source This data was scraped from the JSM 2022 website.
+"talks"
+```
+
+Since this is a tibble, we'll need to make sure our package knows how to handle tibbles:
+
+```{r}
+usethis::use_tibble()
+```
+
+
+## Helper functions
+
+### A convenience function for filtering talks
+
+While some users might just be happy with `talks` itself, we can offer some helpful functions.
+
+```{r}
+#' Get talks based on some criteria
+#' 
+#' @param speakers character vector of speaker names.  Names start with given (first) name, following the format of JSM program.
+#' @param authors character vector of author names. Same as above.
+#' @param people character vector of people names.  This looks for the person as a speaker, author, organizer, and chair.
+#' @param keywords character vector of words to look for in talk title
+#' @param days vector of Dates (e.g. "2022-08-07")
+#' @param session_types character vector, e.g. "Invited Papers"
+#' @export
+get_talks <- function(speakers, authors, people, keywords, days, session_types) {
+  talks <- jsm2022::talks
+  if (!missing(speakers)) {
+    pattern <- paste(speakers, collapse = "|")
+    talks <- talks %>% dplyr::filter(stringr::str_detect(.data$speaker, pattern))
+  }
+  if (!missing(authors)) {
+    pattern <- paste(authors, collapse = "|")
+    talks <- talks %>% dplyr::filter(stringr::str_detect(.data$author, pattern))
+  }
+  if (!missing(people)) {
+    pattern <- paste(people, collapse = "|")
+    talks <- talks %>% 
+      dplyr::filter(
+        stringr::str_detect(.data$author, pattern) |
+          stringr::str_detect(.data$speaker, pattern) |
+          stringr::str_detect(.data$chair, pattern) |
+          stringr::str_detect(.data$organizer, pattern)
+        )
+  }
+  if (!missing(keywords)) {
+    pattern <- paste(keywords, collapse = "|")
+    talks <- talks %>% 
+      dplyr::filter(stringr::str_detect(tolower(.data$title), keywords))
+  }
+  if (!missing(days)) {
+    talks <- talks %>% dplyr::filter(.data$day %in% days)
+  }
+  talks
+}
+```
+
+In the above we used `dplyr`, `stringr`, the `magrittr` pipe, and `.data` so let's make sure these are properly included in the package.
+
+```{r}
+usethis::use_pipe()
+usethis::use_package("dplyr")
+usethis::use_package("stringr")
+usethis::use_import_from("rlang", ".data")
+```
+
+```{r}
+testthat::test_that("get_talks() works", {
+  talk_jb <- get_talks(speakers = "Jacob Bien")
+  testthat::expect_equal(
+    talk_jb$title[[1]],
+    "Mixture of Multivariate Sparse Regressions Modeling for Oceanographic Flow Cytometry Data"
+  )
+  testthat::expect_equal(
+    nrow(get_talks(speakers = c("Jacob Bien", "Guo Yu"))),
+    2
+  )
+  testthat::expect_equal(
+    get_talks(speakers = c("Jacob Bien", "Guo Yu")),
+    get_talks(authors = c("Jacob Bien", "Guo Yu"))
+  )
+  testthat::expect_equal(
+    nrow(get_talks(authors = c("Jacob Bien", "Guo Yu", "Sumanta Basu"))),
+    6
+  )
+  testthat::expect_equal(
+    get_talks(speakers = "Jacob Bien", authors = c("Jacob Bien", "Guo Yu")),
+    talk_jb
+  )
+  testthat::expect_equal(
+    nrow(get_talks(people = "Jacob Bien")),
+    6
+  )
+  testthat::expect_equal(
+    get_talks(people = "Jacob Bien", days = as.Date("2022-08-11")),
+    talk_jb
+  )
+})
+```
+
+### Coauthorship and citation information
+
+Quite a lot of work went into obtaining and processing coauthorship and citation information.  We combined three sources of information:
+
+1. Metadata from all arxiv papers in stat.XX from DATE to DATE (using the [arxiv bulk metadata access OAI protocol](https://arxiv.org/help/oa/index)).
+
+2. Semantic Scholar (S2)'s bulk data sets (on papers, authors, and citations), in which we started with N papers and filtered down to NN papers (written by NNN authors) by restricting attention to papers in statistics journals or having the arxiv stat.XX tag.
+
+3. The JSM program itself, which includes NNNN authors.
+
+The S2 citation data can be thought of as a paper-cites-paper matrix.  We computed from this an author-cites-author matrix.  We then mapped S2 authors to JSM authors.  Entity matching and fusion approaches were used to map the Arxiv and S2 author names to JSM author names.  This is important and challenging since authors publish under many variations of their name (e.g. First Last, First Middle Last, F. Last, First M. Last, etc.) and since multiple people can have the same first and last name.
+
+For the Semantic Scholar data sets we used, we acknowledge the following paper:
+
+> Waleed Ammar, Dirk Groeneveld, Chandra Bhagavatula, Iz Beltagy,
+Miles Crawford, Doug Downey, Jason Dunkelberger, Ahmed Elgohary,
+Sergey Feldman, Vu A. Ha, Rodney Michael Kinney, Sebastian Kohlmeier,
+Kyle Lo, Tyler C. Murray, Hsu-Han Ooi, Matthew E. Peters, Joanna L. Power,
+Sam Skjonsberg, Lucy Lu Wang, Christopher Wilhelm, Zheng Yuan,
+Madeleine van Zuylen, Oren Etzioni, "Construction of the Literature Graph in
+Semantic Scholar." NAACL 2018.
+
+```{r}
+library(Matrix)
+authors <- readRDS(file.path("..", "data", "jsm_authors.RDS"))
+coauthor <- readRDS(file.path("..", "data", "coauthorships.RDS"))
+cites <- readRDS(file.path("..", "data", "author_cites_author.RDS"))
+```
+
+To make the package size as small as possible, let's remove the redundant information before storing in the package:
+
+```{r}
+stopifnot(rownames(coauthor) == authors)
+stopifnot(colnames(coauthor) == authors)
+stopifnot(rownames(cites) == authors)
+stopifnot(colnames(cites) == authors)
+rownames(coauthor) <- colnames(coauthor) <- NULL
+rownames(cites) <- colnames(cites) <- NULL
+```
+
+Let's send these three objects to the package:
+
+```{r}
+usethis::use_data(authors)
+usethis::use_data(coauthor)
+usethis::use_data(cites)
+```
+
+We'll need the package to know about the sparse matrix classes from the `Matrix` package, so let's add it:
+
+```{r}
+usethis::use_package("Matrix")
+# We need to import at least one function since we're not using "Matrix::": 
+usethis::use_import_from("Matrix", "Matrix")
+```
+
+
+```{r}
+#' JSM author names
+#' @format A character vector of 5274 JSM author names
+#' @source This data was scraped from the JSM 2022 program.
+"authors"
+```
+
+```{r}
+#' Coauthorship information on JSM authors
+#' 
+#' A coauthorship matrix.  Element ij gives a numerical measure of how much
+#' author `authors[i]` coauthors with author `authors[j]`.  This can be roughly
+#' thought of as the number of papers coauthored between this pair, even though
+#' that is not strictly true.  These coauthors were computed based on
+#' coauthorship information across three sources: Semantic Scholar, Arxiv, and
+#' the JSM program. An approximate entity matching was performed to associate
+#' names across these different data sets.  Fractional values arise when we have
+#' matched a JSM author to multiple Semantic Scholar authors. 
+#' 
+#' @format A sparse matrix of class "dgCMatrix" from the `Matrix` package.
+#' @source This data was created by processing data from Arxiv, Semantic Scholar, and the JSM 2022 program.
+#' 
+#' Waleed Ammar, Dirk Groeneveld, Chandra Bhagavatula, Iz Beltagy, 
+#' Miles Crawford, Doug Downey, Jason Dunkelberger, Ahmed Elgohary, 
+#' Sergey Feldman, Vu A. Ha, Rodney Michael Kinney, Sebastian Kohlmeier, 
+#' Kyle Lo, Tyler C. Murray, Hsu-Han Ooi, Matthew E. Peters, Joanna L. Power, 
+#' Sam Skjonsberg, Lucy Lu Wang, Christopher Wilhelm, Zheng Yuan, 
+#' Madeleine van Zuylen, Oren Etzioni, "Construction of the Literature Graph in
+#' Semantic Scholar." NAACL 2018.
+"coauthor"
+```
+
+```{r}
+#' Citation information on JSM authors
+#' 
+#' A citation matrix.  Element ij gives a numerical measure of how much
+#' author `authors[i]` cites author `authors[j]`.  This can be roughly thought 
+#' of as the number of times `authors[i]` cites `authors[j]` in the literature.
+#' This was based on Semantic Scholar citation data. An approximate entity matching was performed to associate names across these different data sets.
+#' Fractional values arise when we have matched a JSM author to multiple 
+#' Semantic Scholar authors. 
+#' 
+#' @format A sparse matrix of class "dgCMatrix" from the `Matrix` package.
+#' @source This data was created by processing the JSM 2022 program and the "papers", "authors", and "citations" data sets from Semantic Scholar:
+#'  
+#' Waleed Ammar, Dirk Groeneveld, Chandra Bhagavatula, Iz Beltagy, 
+#' Miles Crawford, Doug Downey, Jason Dunkelberger, Ahmed Elgohary, 
+#' Sergey Feldman, Vu A. Ha, Rodney Michael Kinney, Sebastian Kohlmeier, 
+#' Kyle Lo, Tyler C. Murray, Hsu-Han Ooi, Matthew E. Peters, Joanna L. Power, 
+#' Sam Skjonsberg, Lucy Lu Wang, Christopher Wilhelm, Zheng Yuan, 
+#' Madeleine van Zuylen, Oren Etzioni, "Construction of the Literature Graph in
+#' Semantic Scholar." NAACL 2018.
+"cites"
+```
+
+```{r}
+#' Get indices of nonzero elements of a vector ordered from largest to smallest
+#' 
+#' This is like `which(vec != 0)`, but with indices sorted by size of `vec`.
+#' 
+#' @param vec a numerical vector
+ordered_nz <- function(vec) {
+  ii <- which(vec != 0)
+  if (length(ii) == 0) return(integer(0))
+  ii[order(vec[ii], decreasing = TRUE)]
+}
+```
+
+For example:
+
+```{r}
+ordered_nz(c(0, 0, 14, 0, 2, 100, -2))
+```
+
+```{r}
+testthat::test_that("ordered_nz() works", {
+  testthat::expect_equal(
+    ordered_nz(c(0, 0, 14, 0, 2, 100, -2)),
+    c(6, 3, 5, 7)
+  )
+})
+```
+
+```{r}
+#' Return the JSM authors who are co-authors
+#' 
+#' @param name name of a JSM author
+#' 
+#' @export
+get_coauthors <- function(name) {
+  ii <- which(jsm2022::authors == name)
+  if (length(ii) == 0) {
+    message("Author not found.")
+    return(character(0))
+  }
+  ii_coa <- ordered_nz(jsm2022::coauthor[ii, ])
+  jsm2022::authors[ii_coa]
+}
+```
+
+And let's put in a test.
+
+```{r, eval=FALSE}
+testthat::test_that("get_coauthors() works", {
+  testthat::expect_true("Daniela Witten" %in% get_coauthors("Jacob Bien"))
+})
+```
+
+```{r}
+#' Return the JSM authors that this JSM author cites
+#' 
+#' For some authors (particularly new ones), it can be useful to augment their
+#' citations with those of coauthors.  Use `augment=TRUE` for this.
+#' 
+#' @param name name of a JSM author
+#' @param augment should we include out citations of coauthors?
+#' 
+#' @export
+get_out_citations <- function(name, augment = FALSE) {
+  ii <- which(jsm2022::authors == name)
+  if (length(ii) == 0) {
+    message("Author not found.")
+    return(character(0))
+  }
+  ii_cites <- ordered_nz(jsm2022::cites[ii, ])
+  if (augment) {
+    ii_coa <- ordered_nz(jsm2022::coauthor[ii, ])
+    # weighted sum of who the coauthors cite (weighted by coauthor strength):
+    wtd <- jsm2022::coauthor[ii, ii_coa] %*% jsm2022::cites[ii_coa, ]
+    ii_coa_cites <- ordered_nz(as.numeric(wtd))
+    # start with author's own cites and follow with those of coauthors:
+    ii_cites <- c(ii_cites, setdiff(ii_coa_cites, ii_cites))
+  }
+  jsm2022::authors[ii_cites]
+}
+```
+
+
+```{r}
+#' Return the JSM authors that cite this JSM author
+#' 
+#' For some authors (particularly new ones), it can be useful to augment their
+#' citations with those of coauthors.  Use `augment=TRUE` for this.
+#' 
+#' @param name name of a JSM author
+#' @param augment should we include out citations of coauthors?
+#' 
+#' @export
+get_in_citations <- function(name, augment = FALSE) {
+  ii <- which(jsm2022::authors == name)
+  if (length(ii) == 0) {
+    message("Author not found.")
+    return(character(0))
+  }
+  ii_cites <- ordered_nz(jsm2022::cites[, ii])
+  if (augment) {
+    ii_coa <- ordered_nz(jsm2022::coauthor[ii, ])
+    # weighted sum of who cites the coauthors (weighted by coauthor strength):
+    wtd <- jsm2022::coauthor[ii, ii_coa] %*% t(jsm2022::cites[, ii_coa])
+    ii_coa_cites <- ordered_nz(as.numeric(wtd))
+    # start with author's own cites and follow with those of coauthors:
+    ii_cites <- c(ii_cites, setdiff(ii_coa_cites, ii_cites))
+  }
+  jsm2022::authors[ii_cites]
+}
+```
+
+And let's test these functions.
+
+```{r, eval=FALSE}
+testthat::test_that("get_*_citations() works", {
+  jb_out_cite <- get_out_citations("Jacob Bien", augment = FALSE)
+  jb_in_cite <- get_in_citations("Jacob Bien", augment = FALSE)
+  testthat::expect_true("Daniela Witten" %in% jb_out_cite)
+  testthat::expect_true("Daniela Witten" %in% jb_in_cite)
+  testthat::expect_equal(
+    jb_out_cite,
+    get_out_citations("Jacob Bien", augment = FALSE)[1:length(jb_out_cite)]
+  )
+  testthat::expect_equal(
+    jb_in_cite,
+    get_in_citations("Jacob Bien", augment = FALSE)[1:length(jb_in_cite)]
+  )
+})
+```
+
+## Exporting for import into Google Calendar
+
+```{r}
+#' Export events to a .csv format that can be imported to Google Calendar
+#' 
+#' This will create a .csv file that can then be imported into Google Calendar.
+#' To do so, go to https://calendar.google.com/calendar/u/0/r/settings/export
+#' and then click "Select file from your computer", and find the file created by
+#' this function. Then choose which calendar you want these events added to and
+#' click "Import."  The disadvantage of this approach is that the times (which are
+#' ET) will be entered in the local time of your calendar.  So if your calendar is
+#' in a different time zone when you enter these, the events will be at the wrong 
+#' time.  Using `export_calendar_to_ics()` does not have this problem so is the 
+#' recommended function to use rather than this one.
+#' 
+#' @param schedule output of a call to `get_talks()`
+#' @param file filename of .csv that will be created
+#' 
+#' @seealso [`export_calendar_to_ics`]
+#' @export
+export_calendar_to_csv <- function(schedule, file = NULL) {
+  schedule %>% 
+    dplyr::transmute(
+      Subject = paste0(.data$speaker, ": ", .data$title),
+      `Start Date` = .data$day,
+      `All Day Event` = FALSE,
+      `Start Time` = .data$start_time,
+      `End Time` = .data$end_time,
+      Location = .data$room,
+      Description = stringr::str_glue("Authors: {.data$author}\nSession {.data$session_number}: {.data$session_title} ({.data$session_type})\nOrganizer: {.data$organizer}; Chair: {.data$chair}")
+    ) %>% 
+    readr::write_csv(file)
+}
+```
+
+```{r}
+usethis::use_package("readr")
+```
+
+```{r}
+#' Export events to a .ics file that can be imported to Google Calendar, etc.
+#' 
+#' This will represent the events in the standardized iCalendar format and export
+#' as a .ics file that can then be imported into most calendar apps (including 
+#' Google Calendar). To do so, go to 
+#' https://calendar.google.com/calendar/u/0/r/settings/export
+#' and then click "Select file from your computer", and find the file created by
+#' this function. Then choose which calendar you want these events added to and
+#' click "Import."
+#' 
+#' @param schedule output of a call to `get_talks()`
+#' @param file filename (should end with .ics) that will be created
+#' 
+#' @export
+export_calendar_to_ics <- function(schedule, file = NULL) {
+  if (is.null(file)) 
+    file <- paste0("jsm2022-cal-", 
+                   stringr::str_replace_all(Sys.time(), " ", "-"),
+                   ".ics")
+  cal <- schedule %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(
+      event = calendar::ic_event(
+        start_time = .data$start_time,
+        end_time = as.numeric(difftime(time1 = .data$end_time,
+                                       time2 = .data$start_time,
+                                       units = "hours")),
+        summary = paste0(.data$speaker, ": ", .data$title)
+      )
+    )
+  cal$event$LOCATION <- schedule$room
+  cal$event$DESCRIPTION <- stringr::str_glue_data(
+    schedule, 
+    "Authors: {author}\\nSession {session_number}: {session_title} ({session_type})\\nOrganizer: {organizer}; Chair: {chair}")
+  cal$event %>% 
+    calendar::ic_character() %>%
+    stringr::str_replace_all("^DTSTART", "DTSTART;TZID=America/New_York") %>% 
+    stringr::str_replace_all("^DTEND", "DTEND;TZID=America/New_York") %>% 
+    writeLines(file)
+}
+```
+
+```{r}
+usethis::use_package("calendar")
+```
+
+
+## Documenting the package
+
+We finish by running commands that will document the package.
+
+```{r}
+litr::document() # <-- use instead of devtools::document()
+```
+
+

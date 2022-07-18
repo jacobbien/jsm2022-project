@@ -411,6 +411,25 @@ usethis::use_mit_license(copyright_holder = &quot;J. Bien&quot;)</code></pre>
 #&#39; 
 #&#39; @docType package
 #&#39; @seealso [`get_talks`], [`get_coauthors`], [`get_out_citations`], [`get_in_citations`], [`export_calendar_to_ics`], [`export_calendar_to_csv`]}</code></pre>
+<p>Create a README:</p>
+<pre class="r"><code>readme_txt &lt;- 
+&quot;
+# jsm2022
+
+Navigate the JSM schedule from the comfort of an R console, get personalized recommendations for talks, and export your schedule as an ical.
+
+## About
+
+We scraped the JSM program and wrangled decades of citation and coauthorship data from Semantic Scholar and Arxiv.  We have also included functionality for exporting your schedule as an iCal that can be loaded into Google Calendar or similar. The result is a package that streamlines the process of finding talks that you may want to attend.
+
+## Getting started
+
+``` r
+remotes::install_github(\&quot;jacobbien/jsm2022\&quot;)
+library(jsm2022)
+<a href='#get_talks'>get_talks</a>()
+```&quot;
+cat(readme_txt, file = &quot;README.md&quot;)</code></pre>
 </div>
 <div id="putting-the-jsm-schedule-into-the-package" class="section level2">
 <h2>Putting the JSM schedule into the package</h2>
@@ -582,7 +601,7 @@ these are properly included in the package.</p>
     talk_jb
   )
 })</code></pre>
-<pre><code>## Test passed 🎉</code></pre>
+<pre><code>## Test passed 😸</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>

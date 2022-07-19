@@ -7,7 +7,7 @@
 #' process of finding talks that you may want to attend.
 #' 
 #' @docType package
-#' @seealso [`get_talks`], [`get_coauthors`], [`get_out_citations`], [`get_in_citations`], [`export_calendar_to_ics`], [`export_calendar_to_csv`]}
+#' @seealso [`get_talks`], [`get_coauthors`], [`get_out_citations`], [`get_in_citations`], [`export_calendar_to_ics`], [`export_calendar_to_csv`]
 #' @keywords internal
 "_PACKAGE"
 

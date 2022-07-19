@@ -13,7 +13,7 @@ Calendar or similar. The result is a package that streamlines the
 process of finding talks that you may want to attend.
 }
 \seealso{
-\code{\link{get_talks}}, \code{\link{get_coauthors}}, \code{\link{get_out_citations}}, \code{\link{get_in_citations}}, \code{\link{export_calendar_to_ics}}, \code{\link{export_calendar_to_csv}}}
+\code{\link{get_talks}}, \code{\link{get_coauthors}}, \code{\link{get_out_citations}}, \code{\link{get_in_citations}}, \code{\link{export_calendar_to_ics}}, \code{\link{export_calendar_to_csv}}
 }
 \author{
 \strong{Maintainer}: Jacob Bien \email{jbien@usc.edu}

@@ -19,7 +19,7 @@ get_in_citations <- function(name, augment = FALSE) {
   if (augment) {
     ii_coa <- ordered_nz(jsm2022::coauthor[ii, ])
     # weighted sum of who cites the coauthors (weighted by coauthor strength):
-    wtd <- jsm2022::coauthor[ii, ii_coa] %*% t(jsm2022::cites[, ii_coa])
+    wtd <- jsm2022::coauthor[ii, ii_coa] %*% Matrix::t(jsm2022::cites[, ii_coa])
     ii_coa_cites <- ordered_nz(as.numeric(wtd))
     # start with author's own cites and follow with those of coauthors:
     ii_cites <- c(ii_cites, setdiff(ii_coa_cites, ii_cites))

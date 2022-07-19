@@ -49,11 +49,11 @@ testthat::test_that("get_*_citations() works", {
   testthat::expect_true("Daniela Witten" %in% jb_in_cite)
   testthat::expect_equal(
     jb_out_cite,
-    get_out_citations("Jacob Bien", augment = FALSE)[1:length(jb_out_cite)]
+    get_out_citations("Jacob Bien", augment = TRUE)[1:length(jb_out_cite)]
   )
   testthat::expect_equal(
     jb_in_cite,
-    get_in_citations("Jacob Bien", augment = FALSE)[1:length(jb_in_cite)]
+    get_in_citations("Jacob Bien", augment = TRUE)[1:length(jb_in_cite)]
   )
 })
 

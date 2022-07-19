@@ -610,7 +610,7 @@ these are properly included in the package.</p>
     talk_jb
   )
 })</code></pre>
-<pre><code>## Test passed 🥳</code></pre>
+<pre><code>## Test passed 🎊</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>
@@ -745,7 +745,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 🎉</code></pre>
+<pre><code>## Test passed 😸</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author
@@ -809,7 +809,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
   if (augment) {
     ii_coa &lt;- <a href='#ordered_nz'>ordered_nz</a>(jsm2022::coauthor[ii, ])
     # weighted sum of who cites the coauthors (weighted by coauthor strength):
-    wtd &lt;- jsm2022::coauthor[ii, ii_coa] %*% t(jsm2022::cites[, ii_coa])
+    wtd &lt;- jsm2022::coauthor[ii, ii_coa] %*% Matrix::t(jsm2022::cites[, ii_coa])
     ii_coa_cites &lt;- <a href='#ordered_nz'>ordered_nz</a>(as.numeric(wtd))
     # start with author&#39;s own cites and follow with those of coauthors:
     ii_cites &lt;- c(ii_cites, setdiff(ii_coa_cites, ii_cites))
@@ -824,11 +824,11 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
   testthat::expect_true(&quot;Daniela Witten&quot; %in% jb_in_cite)
   testthat::expect_equal(
     jb_out_cite,
-    <a href='#get_out_citations'>get_out_citations</a>(&quot;Jacob Bien&quot;, augment = FALSE)[1:length(jb_out_cite)]
+    <a href='#get_out_citations'>get_out_citations</a>(&quot;Jacob Bien&quot;, augment = TRUE)[1:length(jb_out_cite)]
   )
   testthat::expect_equal(
     jb_in_cite,
-    <a href='#get_in_citations'>get_in_citations</a>(&quot;Jacob Bien&quot;, augment = FALSE)[1:length(jb_in_cite)]
+    <a href='#get_in_citations'>get_in_citations</a>(&quot;Jacob Bien&quot;, augment = TRUE)[1:length(jb_in_cite)]
   )
 })</code></pre>
 </div>

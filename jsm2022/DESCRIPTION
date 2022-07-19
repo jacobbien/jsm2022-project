@@ -11,7 +11,7 @@ Description: Navigate the JSM schedule from the comfort of an R console,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Depends: 
     R (>= 2.10)
 LazyData: true
@@ -27,5 +27,5 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-LitrVersionUsed: 0.0.3
-LitrId: 6f1a5aab92d5da223821891779d626e5
+LitrVersionUsed: 0.0.4
+LitrId: 5021ca34b7454ba2edf56b934099f14c

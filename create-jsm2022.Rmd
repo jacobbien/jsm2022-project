@@ -8,7 +8,7 @@ params:
   package_parent_dir: "." # <-- relative to this file's location
 ---
 
-<!-- This Rmd file contains all the code needed to define an R package.  Press "Knit" in RStudio or more generally run `rmarkdown::render("name-of-this-file.Rmd")` to generate the R package.  Remember that when you want to modify anything about the R package, you should modify this document rather than the package that is outputted.
+<!-- This Rmd file contains all the code needed to define an R package.  Press "Knit" in RStudio or more generally run `rmarkdown::render("create-jsm2022.Rmd")` to generate the R package.  Remember that when you want to modify anything about the R package, you should modify this document rather than the package that is outputted.
 -->
 
 Note: This package was generated using the `litr` R package, which lets you define full R packages in a single R Markdown file. For more on `litr`, see [here](https://github.com/jacobbien/litr-project/tree/main/litr).
@@ -268,9 +268,9 @@ Quite a lot of work went into obtaining and processing coauthorship and citation
 
 1. Metadata from all arxiv papers in stat.XX from DATE to DATE (using the [arxiv bulk metadata access OAI protocol](https://arxiv.org/help/oa/index)).
 
-2. Semantic Scholar (S2)'s bulk data sets (on papers, authors, and citations), in which we started with N papers and filtered down to NN papers (written by NNN authors) by restricting attention to papers in statistics journals or having the arxiv stat.XX tag.
+2. Semantic Scholar (S2)'s bulk data sets (on papers, authors, and citations), in which we started with about 200M papers and filtered down to about 280K papers (written by about 320K authors) by restricting attention to papers in statistics journals or having the arxiv stat.XX tag.
 
-3. The JSM program itself, which includes NNNN authors.
+3. The JSM program itself, which includes 5274 authors.
 
 The S2 citation data can be thought of as a paper-cites-paper matrix.  We computed from this an author-cites-author matrix.  We then mapped S2 authors to JSM authors.  Entity matching and fusion approaches were used to map the Arxiv and S2 author names to JSM author names.  This is important and challenging since authors publish under many variations of their name (e.g. First Last, First Middle Last, F. Last, First M. Last, etc.) and since multiple people can have the same first and last name.
 

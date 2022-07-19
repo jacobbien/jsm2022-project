@@ -370,7 +370,7 @@ package</h1>
 </div>
 
 
-<!-- This Rmd file contains all the code needed to define an R package.  Press "Knit" in RStudio or more generally run `rmarkdown::render("name-of-this-file.Rmd")` to generate the R package.  Remember that when you want to modify anything about the R package, you should modify this document rather than the package that is outputted.
+<!-- This Rmd file contains all the code needed to define an R package.  Press "Knit" in RStudio or more generally run `rmarkdown::render("create-jsm2022.Rmd")` to generate the R package.  Remember that when you want to modify anything about the R package, you should modify this document rather than the package that is outputted.
 -->
 <p>Note: This package was generated using the <code>litr</code> R
 package, which lets you define full R packages in a single R Markdown
@@ -610,7 +610,7 @@ these are properly included in the package.</p>
     talk_jb
   )
 })</code></pre>
-<pre><code>## Test passed 🌈</code></pre>
+<pre><code>## Test passed 😀</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>
@@ -621,10 +621,11 @@ and citation information. We combined three sources of information:</p>
 (using the <a href="https://arxiv.org/help/oa/index">arxiv bulk metadata
 access OAI protocol</a>).</p></li>
 <li><p>Semantic Scholar (S2)’s bulk data sets (on papers, authors, and
-citations), in which we started with N papers and filtered down to NN
-papers (written by NNN authors) by restricting attention to papers in
-statistics journals or having the arxiv stat.XX tag.</p></li>
-<li><p>The JSM program itself, which includes NNNN authors.</p></li>
+citations), in which we started with about 200M papers and filtered down
+to about 280K papers (written by about 320K authors) by restricting
+attention to papers in statistics journals or having the arxiv stat.XX
+tag.</p></li>
+<li><p>The JSM program itself, which includes 5274 authors.</p></li>
 </ol>
 <p>The S2 citation data can be thought of as a paper-cites-paper matrix.
 We computed from this an author-cites-author matrix. We then mapped S2
@@ -744,7 +745,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 😀</code></pre>
+<pre><code>## Test passed 🌈</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author

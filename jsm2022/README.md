@@ -12,7 +12,7 @@ We scraped the JSM program and wrangled decades of citation and coauthorship dat
 To install the package:
 
 ``` r
-remotes::install_github("jacobbien/jsm2022")
+remotes::install_github("jacobbien/jsm2022-project", subdir = "jsm2022")
 ```
  
 An example of the sort of thing you can do with the package:

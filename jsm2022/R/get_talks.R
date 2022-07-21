@@ -30,9 +30,9 @@ get_talks <- function(speakers, authors, people, keywords, days, session_types) 
         )
   }
   if (!missing(keywords)) {
-    pattern <- paste(keywords, collapse = "|")
+    pattern <- paste(tolower(keywords), collapse = "|")
     talks <- talks %>% 
-      dplyr::filter(stringr::str_detect(tolower(.data$title), keywords))
+      dplyr::filter(stringr::str_detect(tolower(.data$title), pattern))
   }
   if (!missing(days)) {
     talks <- talks %>% dplyr::filter(.data$day %in% days)

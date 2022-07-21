@@ -553,9 +553,9 @@ we can offer some helpful functions.</p>
         )
   }
   if (!missing(keywords)) {
-    pattern &lt;- paste(keywords, collapse = &quot;|&quot;)
+    pattern &lt;- paste(tolower(keywords), collapse = &quot;|&quot;)
     talks &lt;- talks %&gt;% 
-      dplyr::filter(stringr::str_detect(tolower(.data$title), keywords))
+      dplyr::filter(stringr::str_detect(tolower(.data$title), pattern))
   }
   if (!missing(days)) {
     talks &lt;- talks %&gt;% dplyr::filter(.data$day %in% days)
@@ -609,6 +609,14 @@ these are properly included in the package.</p>
     6
   )
   testthat::expect_equal(
+    <a href='#get_talks'>get_talks</a>(keywords = &quot;cytometry&quot;),
+    talk_jb
+  )
+  testthat::expect_equal(
+    <a href='#get_talks'>get_talks</a>(keywords = &quot;Cytometry&quot;),
+    talk_jb
+  )
+  testthat::expect_equal(
     <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;, session_types = &quot;Invited Papers&quot;),
     talk_jb
   )
@@ -618,7 +626,6 @@ these are properly included in the package.</p>
     <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;)
   )
 })</code></pre>
-<pre><code>## Test passed 🥇</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>
@@ -753,7 +760,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 🎊</code></pre>
+<pre><code>## Test passed 😸</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author

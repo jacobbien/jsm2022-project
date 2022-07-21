@@ -208,9 +208,9 @@ get_talks <- function(speakers, authors, people, keywords, days, session_types) 
         )
   }
   if (!missing(keywords)) {
-    pattern <- paste(keywords, collapse = "|")
+    pattern <- paste(tolower(keywords), collapse = "|")
     talks <- talks %>% 
-      dplyr::filter(stringr::str_detect(tolower(.data$title), keywords))
+      dplyr::filter(stringr::str_detect(tolower(.data$title), pattern))
   }
   if (!missing(days)) {
     talks <- talks %>% dplyr::filter(.data$day %in% days)
@@ -231,7 +231,7 @@ usethis::use_package("stringr")
 usethis::use_import_from("rlang", ".data")
 ```
 
-```{r}
+```{r, eval=FALSE}
 testthat::test_that("get_talks() works", {
   talk_jb <- get_talks(speakers = "Jacob Bien")
   testthat::expect_equal(
@@ -257,6 +257,14 @@ testthat::test_that("get_talks() works", {
   testthat::expect_equal(
     nrow(get_talks(people = "Jacob Bien")),
     6
+  )
+  testthat::expect_equal(
+    get_talks(keywords = "cytometry"),
+    talk_jb
+  )
+  testthat::expect_equal(
+    get_talks(keywords = "Cytometry"),
+    talk_jb
   )
   testthat::expect_equal(
     get_talks(people = "Jacob Bien", session_types = "Invited Papers"),

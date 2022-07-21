@@ -560,6 +560,9 @@ we can offer some helpful functions.</p>
   if (!missing(days)) {
     talks &lt;- talks %&gt;% dplyr::filter(.data$day %in% days)
   }
+  if (!missing(session_types)) {
+    talks &lt;- talks %&gt;% dplyr::filter(.data$session_type %in% session_types)
+  }
   talks
 }</code></pre>
 <p>In the above we used <code>dplyr</code>, <code>stringr</code>, the
@@ -606,11 +609,16 @@ these are properly included in the package.</p>
     6
   )
   testthat::expect_equal(
-    <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;, days = as.Date(&quot;2022-08-11&quot;)),
+    <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;, session_types = &quot;Invited Papers&quot;),
     talk_jb
   )
+  testthat::expect_equal(
+    <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;, 
+              session_types = c(&quot;Invited Papers&quot;, &quot;Topic Contributed Papers&quot;)),
+    <a href='#get_talks'>get_talks</a>(people = &quot;Jacob Bien&quot;)
+  )
 })</code></pre>
-<pre><code>## Test passed 🎊</code></pre>
+<pre><code>## Test passed 🥇</code></pre>
 </div>
 <div id="coauthorship-and-citation-information" class="section level3">
 <h3>Coauthorship and citation information</h3>
@@ -745,7 +753,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 😸</code></pre>
+<pre><code>## Test passed 🎊</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author

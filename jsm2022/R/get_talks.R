@@ -37,5 +37,8 @@ get_talks <- function(speakers, authors, people, keywords, days, session_types) 
   if (!missing(days)) {
     talks <- talks %>% dplyr::filter(.data$day %in% days)
   }
+  if (!missing(session_types)) {
+    talks <- talks %>% dplyr::filter(.data$session_type %in% session_types)
+  }
   talks
 }

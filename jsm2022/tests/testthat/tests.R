@@ -26,8 +26,13 @@ testthat::test_that("get_talks() works", {
     6
   )
   testthat::expect_equal(
-    get_talks(people = "Jacob Bien", days = as.Date("2022-08-11")),
+    get_talks(people = "Jacob Bien", session_types = "Invited Papers"),
     talk_jb
+  )
+  testthat::expect_equal(
+    get_talks(people = "Jacob Bien", 
+              session_types = c("Invited Papers", "Topic Contributed Papers")),
+    get_talks(people = "Jacob Bien")
   )
 })
 

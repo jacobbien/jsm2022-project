@@ -516,6 +516,17 @@ to handle tibbles:</p>
 ## ✔ Writing &#39;NAMESPACE&#39;
 ## • Document a returned tibble like so:
 ##   #&#39; @return a [tibble][tibble::tibble-package]</code></pre>
+<p>Let’s also add a character vector of words appearing in the
+titles:</p>
+<pre class="r"><code>words &lt;- readRDS(file.path(&quot;..&quot;, &quot;data&quot;, &quot;words.RDS&quot;))
+usethis::use_data(words)</code></pre>
+<pre><code>## ✔ Saving &#39;words&#39; to &#39;data/words.rda&#39;
+## • Document your data (see &#39;https://r-pkgs.org/data.html&#39;)</code></pre>
+<pre class="r"><code>#&#39; JSM words used in titles
+#&#39; @format A character vector of 3966 JSM author names
+#&#39; @source This data was scraped from the JSM 2022 program.
+&quot;words&quot;</code></pre>
+<pre><code>## [1] &quot;words&quot;</code></pre>
 </div>
 <div id="helper-functions" class="section level2">
 <h2>Helper functions</h2>
@@ -946,7 +957,8 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
 ## Writing &#39;jsm2022-package.Rd&#39;
 ## Writing &#39;ordered_nz.Rd&#39;
 ## Writing &#39;talks.Rd&#39;
-## Writing &#39;pipe.Rd&#39;</code></pre>
+## Writing &#39;pipe.Rd&#39;
+## Writing &#39;words.Rd&#39;</code></pre>
 </div>
 
 

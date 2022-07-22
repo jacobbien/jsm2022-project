@@ -170,6 +170,22 @@ Since this is a tibble, we'll need to make sure our package knows how to handle 
 usethis::use_tibble()
 ```
 
+Let's also add a character vector of words appearing in the titles:
+
+```{r}
+words <- readRDS(file.path("..", "data", "words.RDS"))
+usethis::use_data(words)
+```
+
+
+```{r}
+#' JSM words used in titles
+#' @format A character vector of 3966 JSM author names
+#' @source This data was scraped from the JSM 2022 program.
+"words"
+```
+
+
 
 ## Helper functions
 

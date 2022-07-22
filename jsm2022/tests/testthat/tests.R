@@ -26,6 +26,14 @@ testthat::test_that("get_talks() works", {
     6
   )
   testthat::expect_equal(
+    get_talks(keywords = "cytometry"),
+    talk_jb
+  )
+  testthat::expect_equal(
+    get_talks(keywords = "Cytometry"),
+    talk_jb
+  )
+  testthat::expect_equal(
     get_talks(people = "Jacob Bien", session_types = "Invited Papers"),
     talk_jb
   )

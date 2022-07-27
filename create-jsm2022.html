@@ -546,15 +546,21 @@ we can offer some helpful functions.</p>
 <span id='get_talks'>get_talks</span> &lt;- function(speakers, authors, people, keywords, days, session_types) {
   talks &lt;- jsm2022::talks
   if (!missing(speakers)) {
-    pattern &lt;- paste(speakers, collapse = &quot;|&quot;)
+    pattern &lt;- paste(speakers, collapse = &quot;|&quot;) %&gt;% 
+      stringr::str_replace(&quot;\\(&quot;, &quot;\\\\(&quot;) %&gt;% # escape parentheses in names
+      stringr::str_replace(&quot;\\)&quot;, &quot;\\\\)&quot;) 
     talks &lt;- talks %&gt;% dplyr::filter(stringr::str_detect(.data$speaker, pattern))
   }
   if (!missing(authors)) {
-    pattern &lt;- paste(authors, collapse = &quot;|&quot;)
+    pattern &lt;- paste(authors, collapse = &quot;|&quot;) %&gt;% 
+      stringr::str_replace(&quot;\\(&quot;, &quot;\\\\(&quot;) %&gt;% # escape parentheses in names
+      stringr::str_replace(&quot;\\)&quot;, &quot;\\\\)&quot;)
     talks &lt;- talks %&gt;% dplyr::filter(stringr::str_detect(.data$author, pattern))
   }
   if (!missing(people)) {
-    pattern &lt;- paste(people, collapse = &quot;|&quot;)
+    pattern &lt;- paste(people, collapse = &quot;|&quot;) %&gt;% 
+      stringr::str_replace(&quot;\\(&quot;, &quot;\\\\(&quot;) %&gt;% # escape parentheses in names
+      stringr::str_replace(&quot;\\)&quot;, &quot;\\\\)&quot;)
     talks &lt;- talks %&gt;% 
       dplyr::filter(
         stringr::str_detect(.data$author, pattern) |
@@ -771,7 +777,7 @@ usethis::use_import_from(&quot;Matrix&quot;, &quot;Matrix&quot;)</code></pre>
     c(6, 3, 5, 7)
   )
 })</code></pre>
-<pre><code>## Test passed 😸</code></pre>
+<pre><code>## Test passed 🥇</code></pre>
 <pre class="r"><code>#&#39; Return the JSM authors who are co-authors
 #&#39; 
 #&#39; @param name name of a JSM author

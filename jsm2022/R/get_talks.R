@@ -12,15 +12,21 @@
 get_talks <- function(speakers, authors, people, keywords, days, session_types) {
   talks <- jsm2022::talks
   if (!missing(speakers)) {
-    pattern <- paste(speakers, collapse = "|")
+    pattern <- paste(speakers, collapse = "|") %>% 
+      stringr::str_replace("\\(", "\\\\(") %>% # escape parentheses in names
+      stringr::str_replace("\\)", "\\\\)") 
     talks <- talks %>% dplyr::filter(stringr::str_detect(.data$speaker, pattern))
   }
   if (!missing(authors)) {
-    pattern <- paste(authors, collapse = "|")
+    pattern <- paste(authors, collapse = "|") %>% 
+      stringr::str_replace("\\(", "\\\\(") %>% # escape parentheses in names
+      stringr::str_replace("\\)", "\\\\)")
     talks <- talks %>% dplyr::filter(stringr::str_detect(.data$author, pattern))
   }
   if (!missing(people)) {
-    pattern <- paste(people, collapse = "|")
+    pattern <- paste(people, collapse = "|") %>% 
+      stringr::str_replace("\\(", "\\\\(") %>% # escape parentheses in names
+      stringr::str_replace("\\)", "\\\\)")
     talks <- talks %>% 
       dplyr::filter(
         stringr::str_detect(.data$author, pattern) |
